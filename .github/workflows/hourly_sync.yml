@@ -1,0 +1,86 @@
+# .github/workflows/hourly_sync.yml
+#
+# GitHub Actions workflow – Hourly TDTU Schedule Sync
+#
+# Schedule: runs every hour at minute 0.
+# This crawls the TDTU portal and synchronizes the results to Google Calendar.
+# It also runs once for every push to main and can be started manually.
+
+name: Hourly Schedule Sync
+
+on:
+  push:
+    branches: [main]
+  schedule:
+    # Cron syntax: minute hour day-of-month month day-of-week
+    # "0 * * * *" = every hour at :00
+    - cron: "0 * * * *"
+
+  # Allow manual triggers from the GitHub Actions UI
+  workflow_dispatch:
+
+jobs:
+  sync:
+    name: Crawl & Sync TDTU Schedule
+    runs-on: ubuntu-latest
+
+    # Restrict GITHUB_TOKEN to the minimum required permissions.
+    permissions:
+      contents: read
+
+    # All secrets are injected as environment variables so the Python code
+    # can read them with os.environ.
+    env:
+      STUDENT_ID: ${{ secrets.STUDENT_ID }}
+      PASSWORD: ${{ secrets.PASSWORD }}
+      TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+      TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+      CRAWLER_WEEKS_AHEAD: ${{ secrets.CRAWLER_WEEKS_AHEAD }}
+      GOOGLE_CALENDAR_ID: ${{ secrets.GOOGLE_CALENDAR_ID }}
+      GOOGLE_SERVICE_ACCOUNT_JSON: ${{ secrets.GOOGLE_SERVICE_ACCOUNT_JSON }}
+      GOOGLE_CALENDAR_REQUIRED: ${{ secrets.GOOGLE_CALENDAR_REQUIRED }}
+      APP_TIMEZONE: Asia/Ho_Chi_Minh
+
+    steps:
+      # -----------------------------------------------------------------------
+      # 1. Check out the repository
+      # -----------------------------------------------------------------------
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # -----------------------------------------------------------------------
+      # 2. Set up Python 3.11
+      # -----------------------------------------------------------------------
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: "pip"           # Cache pip downloads between runs
+
+      # -----------------------------------------------------------------------
+      # 3. Install Python dependencies
+      # -----------------------------------------------------------------------
+      - name: Install Python dependencies
+        run: pip install -r requirements.txt
+
+      # -----------------------------------------------------------------------
+      # 4. Install Playwright browsers (Chromium only)
+      # -----------------------------------------------------------------------
+      - name: Install Playwright browsers
+        run: playwright install --with-deps chromium
+
+      # -----------------------------------------------------------------------
+      # 5. Create Google service account file (if needed)
+      # -----------------------------------------------------------------------
+      - name: Create Google service account file
+        if: env.GOOGLE_SERVICE_ACCOUNT_JSON != ''
+        run: |
+          echo "${{ secrets.GOOGLE_SERVICE_ACCOUNT_JSON }}" > service-account.json
+
+      # -----------------------------------------------------------------------
+      # 6. Run the crawler and Google Calendar synchronization
+      # -----------------------------------------------------------------------
+      - name: Run hourly data collection and sync
+        env:
+          GOOGLE_SERVICE_ACCOUNT_FILE: ${{ github.workspace }}/service-account.json
+        run: python run_hour.py

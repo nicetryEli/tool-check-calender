@@ -1,0 +1,67 @@
+# .github/workflows/daily_tkb.yml
+#
+# GitHub Actions workflow – TDTU Daily Morning Notification
+#
+# Schedule: runs every day at 17:00 UTC = 00:00 AM Vietnam time (UTC+7).
+# This sends the morning briefing with today's schedule and appointments.
+# Requires data to already be synced (run_hour.py should have run earlier).
+# Can also be triggered manually via the "Run workflow" button.
+#
+# Note: Data collection (crawl, sync, calendar) is handled by hourly_sync.yml
+
+name: Daily Morning Notification
+
+on:
+  schedule:
+    # Cron syntax: minute hour day-of-month month day-of-week
+    # 17:10 UTC = 00:10 ICT (UTC+7), delayed to avoid race with hourly sync at :00
+    - cron: "10 17 * * *"
+
+  # Allow manual triggers from the GitHub Actions UI
+  workflow_dispatch:
+
+jobs:
+  notify:
+    name: Fetch & Send Schedule
+    runs-on: ubuntu-latest
+
+    # Restrict GITHUB_TOKEN to the minimum required permissions.
+    # This workflow only reads repository contents (checkout) and does not
+    # write back to the repository.
+    permissions:
+      contents: read
+
+    # All secrets are injected as environment variables so the Python code
+    # can read them with os.environ.
+    env:
+      TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+      TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+      GOOGLE_CALENDAR_ID: ${{ secrets.GOOGLE_CALENDAR_ID }}
+      GOOGLE_SERVICE_ACCOUNT_JSON: ${{ secrets.GOOGLE_SERVICE_ACCOUNT_JSON }}
+      GOOGLE_CALENDAR_REQUIRED: ${{ secrets.GOOGLE_CALENDAR_REQUIRED }}
+      APP_TIMEZONE: Asia/Ho_Chi_Minh
+
+    steps:
+      # -----------------------------------------------------------------------
+      # 1. Check out the repository
+      # -----------------------------------------------------------------------
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # -----------------------------------------------------------------------
+      # 2. Set up Python 3.11
+      # -----------------------------------------------------------------------
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: "pip"           # Cache pip downloads between runs
+
+      # -----------------------------------------------------------------------
+      # 3. Install Python dependencies
+      # -----------------------------------------------------------------------
+      - name: Install Python dependencies
+        run: pip install -r requirements.txt
+
+      - name: Send morning Telegram notification
+        run: python main.py

@@ -1,0 +1,61 @@
+# Environment files and secrets
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*service-account*.json
+amazing-smile-441004-j1-58a596defc04.json
+
+# Personal contact data
+contact.txt
+
+# Virtual environments
+.venv/
+venv/
+
+# Python caches and artifacts
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.coverage
+
+# Build outputs
+build/
+dist/
+*.egg
+plan.md
+
+# Runtime files
+*.log
+
+# Generated local exports
+exports/
+*.ics
+
+# Local editor/OS files
+.vscode/
+.idea/
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
+
+# Local agent/tool configs
+.claude/
+.code-review-graph/
+.gemini/
+.kiro/
+.openclaude/
+.qoder/
+.cursorrules
+.windsurfrules
+.opencode.json
+CLAUDE.md
+test_local_sync.py
+QODER.md
+GEMINI.md
+AGENTS.md
+.mcp.json
+verify_e2e_*.py
