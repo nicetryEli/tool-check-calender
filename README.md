@@ -1,4 +1,4 @@
-# TDTU Calendar & Telegram Bot (Source: Ngtuananh1909 <my favourite kouhai>)
+# TDTU Calendar & Telegram Bot (Source: Ngtuananh1909 \<my favourite kouhai\>)
 
 Tự động lấy lịch học, lịch thi và deadline eLearning từ cổng TDTU, sau đó đồng bộ trực tiếp vào Google Calendar. Telegram chỉ là giao diện xem và thêm lịch; Google Calendar là nơi lưu trữ duy nhất.
 
