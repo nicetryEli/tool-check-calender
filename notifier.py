@@ -154,12 +154,12 @@ def _build_message(classes: list[dict]) -> str:
     date_str = today.strftime("%d/%m/%Y")
 
     lines: list[str] = [
-        f"📅 *Lịch học hôm nay \\- {_escape(weekday_name)}, {_escape(date_str)}*",
+        f"📅 *Lịch học hôm nay của ngài \\- {_escape(weekday_name)}, {_escape(date_str)}*",
         "",
     ]
 
     if not classes:
-        lines.append("✅ Hôm nay không có lớp học\\. Nghỉ ngơi thôi\\! 🎉")
+        lines.append("✅ Hôm nay không có lớp học thưa Master\\. Ngài hãy nghỉ ngơi hôm nay\\! 🎉")
     else:
         for idx, cls in enumerate(classes, start=1):
             subject = _escape(cls.get("subject_name", "N/A"))
@@ -194,13 +194,13 @@ def _build_combined_message(
     date_str = today.strftime("%d/%m/%Y")
 
     lines: list[str] = [
-        f"📅 *Kế hoạch hôm nay \\- {_escape(weekday_name)}, {_escape(date_str)}*",
+        f"📅 *Kế hoạch hôm nay của ngài, thưa Master \\- {_escape(weekday_name)}, {_escape(date_str)}*",
         "",
         "🎓 *Lịch học*",
     ]
 
     if not classes:
-        lines += ["Không có lớp học\\.", ""]
+        lines += ["Không có lớp học ạ\\.", ""]
     else:
         for idx, cls in enumerate(classes, start=1):
             subject = _escape(cls.get("subject_name", "N/A"))
@@ -259,7 +259,7 @@ def _build_combined_message(
                 lines.append(f"   📍 {room}")
         lines.append("")
 
-    lines.append("_Hom nay minh luon dong hanh cung ban, co gi can thi nhan minh nha\\!_")
+    lines.append("Được phục vụ ngài là vinh hạnh của tôi, hãy ra lệnh nếu ngài cần tôi phục vụ\\ thưa \"My Lady\"\\~")
     return "\n".join(lines)
 
 

@@ -65,15 +65,15 @@ HEALTH_PATH = "/health"
 WEBHOOK_INFO_PATH = "/telegram/webhook/info"
 GEMINI_HEALTH_PATH = "/gemini/health"
 _ADD_FORM_STATES: dict[str, dict[str, object]] = {}
-ADD_ONLY_GUIDANCE_TEXT = "Để thêm lịch, Master dùng /add. Tôi sẽ hỏi lần lượt từng mục để Master nhập nhanh hơn nhé."
+ADD_ONLY_GUIDANCE_TEXT = "Để thêm lịch, Master dùng /add. Tôi sẽ hỏi lần lượt từng mục để Master nhập nhanh hơn ạ."
 START_HELP_TEXT = (
-    "Tôi hiện hỗ trợ các lệnh sau:\n"
+    "Master hãy ra lệnh cho tôi:\n"
     "/today - Xem lịch hẹn hôm nay\n"
     "/schedule - Xem lịch học\n"
     "/deadline - Xem deadline eLearning\n"
     "/exam - Xem lịch thi 90 ngày tới\n"
     "/add - Mở form thêm lịch\n\n"
-    "Muốn tạo lịch mới thì dùng /add, Tôi sẽ hỏi lần lượt Ngày, Giờ, Làm gì, Ở đâu."
+    "Nếu ngài muốn tạo lịch mới thì dùng /add, Tôi sẽ hỏi lần lượt Ngày, Giờ, Làm gì, Ở đâu."
 )
 
 
@@ -403,7 +403,7 @@ async def telegram_webhook(
         if lowered == "/add":
             state = _new_add_form_state()
             _ADD_FORM_STATES[chat_id] = state
-            _send_add_form_step(token, chat_id, state, prefix="Bắt đầu form thêm lịch.")
+            _send_add_form_step(token, chat_id, state, prefix="Bắt đầu form thêm lịch, xin hãy ra lệnh thưa \"My Lady\".")
             return {"ok": True}
         _send_text(token, chat_id, ADD_ONLY_GUIDANCE_TEXT)
         return {"ok": True}

@@ -40,20 +40,20 @@ logging.basicConfig(
 )
 
 HELP_TEXT = (
-    "Hi ban, minh san sang ho tro ban ne.\n\n"
-    "Lenh co san:\n"
-    "/today - Xem lich hen hom nay\n"
-    "/schedule - Xem lich hoc\n"
+    "Chào ngày mới thưa Master, tôi chờ lệnh từ ngài.\n\n"
+    "Command có sẵn:\n"
+    "/today - Xem lịch hẹn hôm nay\n"
+    "/schedule - Xem lịch học\n"
     "/deadline - Xem deadline eLearning\n"
-    "/exam - Xem lich thi 90 ngay toi\n"
-    "/add - Mo form them lich\n\n"
-    "Muon tao lich moi thi dung /add, bot se hoi lan luot Ngay, Gio, Lam gi, O dau."
+    "/exam - Xem lịch thi 90 ngày tới\n"
+    "/add - Mở form thêm lịch\n\n"
+    "Nếu Master muốn tạo lịch, hãy dùng lệnh /add, tôi sẽ hỏi lần lượt ngày, giờ, làm gì, ở đâu."
 )
 
-ADD_ONLY_GUIDANCE_TEXT = "De them lich, ban dung /add. Bot se hoi lan luot tung muc de ban nhap nhanh hon nhe."
+ADD_ONLY_GUIDANCE_TEXT = "Để thêm lịch, Ngài hãy dùng lệnh /add. Tôi sẽ hỏi lần lượt các yêu cầu ạ."
 
-CONFIRM_PREFIX = "Xong roi ne, minh da ghi lich cho ban:"
-CREATE_ERROR_PREFIX = "Minh chua tao duoc lich hen luc nay"
+CONFIRM_PREFIX = "Đã hoàn thành thưa Master, đây là lịch hẹn ngài đã tạo:"
+CREATE_ERROR_PREFIX = "Xin lỗi thưa Master, tôi không thể tạo lịch hẹn, lý do là: "
 ADD_FORM_DONE_CALLBACK = "addform:done"
 ADD_FORM_CANCEL_CALLBACK = "addform:cancel"
 ADD_FORM_SKIP_WHERE_CALLBACK = "addform:skip_where"
@@ -143,7 +143,7 @@ def _parse_schedule_day_arg(arg: str | None, today: dt.date | None = None) -> dt
         return dt.date(int(year or base.year), int(month), int(day))
     if re.fullmatch(r"\d{4}-\d{2}-\d{2}", value):
         return dt.date.fromisoformat(value)
-    raise ValueError("Không đọc được ngày. Dùng: hôm nay, mai, thứ 2..CN, DD/MM hoặc YYYY-MM-DD.")
+    raise ValueError("Tôi không đọc được ngày. Master hãy dùng: hôm nay, mai, thứ 2..CN, DD/MM hoặc YYYY-MM-DD.")
 
 
 def _parse_add_fields(text: str) -> dict[str, str | None]:
@@ -187,9 +187,9 @@ def _parse_input(text: str) -> tuple[str, dt.date, str, str | None]:
     rest = rest.strip()
 
     if not title:
-        raise ValueError("Tiêu đề không được rỗng.")
+        raise ValueError("Tiêu đề không được rỗng, thưa Master.")
     if not rest:
-        raise ValueError("Thiếu phần thời gian.")
+        raise ValueError("Thiếu phần thời gian rồi Master ạ.")
 
     # Try parsing full remainder as time first.
     try:
@@ -212,7 +212,7 @@ def _parse_input(text: str) -> tuple[str, dt.date, str, str | None]:
             continue
 
     raise ValueError(
-        "Không đọc được thời gian. Dùng format: "
+        "Tôi không đọc được thời gian. Xin Master dùng format: "
         "tieude-thoigian-diadiem(optional)."
     )
 
@@ -314,14 +314,14 @@ def _parse_time_field(raw: str) -> tuple[dt.date, str]:
         return now.date(), _validate_hhmm(h, mi)
 
     raise ValueError(
-        "Không đọc được thời gian. Dùng một trong các format: "
+        "Tôi không đọc được thời gian. Xin Master hãy dùng một trong các format: "
         "YYYY-MM-DD HHhMM | DD/MM/YYYY HHhMM | DD/MM HHhMM | HHhMM"
     )
 
 
 def _validate_hhmm(hour: int, minute: int) -> str:
     if not (0 <= hour <= 23 and 0 <= minute <= 59):
-        raise ValueError("Giờ không hợp lệ.")
+        raise ValueError("Giờ không hợp lệ thưa Master.")
     return f"{hour:02d}:{minute:02d}"
 
 
@@ -331,7 +331,7 @@ def _parse_date_field(raw: str, *, reference_date: dt.date | None = None) -> dt.
     base = reference_date or local_today()
 
     if not value:
-        raise ValueError("Ngày không được để trống.")
+        raise ValueError("Ngày không được để trống đâu Master à.")
 
     if re.fullmatch(r"\d{4}-\d{1,2}-\d{1,2}", value):
         year, month, day = map(int, value.split("-"))
@@ -342,17 +342,17 @@ def _parse_date_field(raw: str, *, reference_date: dt.date | None = None) -> dt.
         day, month, year = m.groups()
         return dt.date(int(year or base.year), int(month), int(day))
 
-    raise ValueError("Không đọc được ngày. Dùng YYYY-MM-DD hoặc DD/MM hoặc DD/MM/YYYY.")
+    raise ValueError("Không đọc được ngày thưa Master. Dùng YYYY-MM-DD hoặc DD/MM hoặc DD/MM/YYYY ạ.")
 
 
 def _parse_clock_parts(raw: str) -> tuple[int, int]:
     value = str(raw or "").strip()
     m = re.fullmatch(r"(\d{1,2})h(\d{2})", value)
     if not m:
-        raise ValueError("Không đọc được giờ. Dùng HHhMM, ví dụ 9h00 hoặc 09h00.")
+        raise ValueError("Tôi không đọc được giờ. Master hãy dùng HHhMM, ví dụ 9h00 hoặc 09h00.")
     hour, minute = map(int, m.groups())
     if not (0 <= hour <= 23 and 0 <= minute <= 59):
-        raise ValueError("Giờ không hợp lệ.")
+        raise ValueError("Giờ không hợp lệ thưa Master.")
     return hour, minute
 
 
@@ -430,7 +430,7 @@ def _format_progress(row: dict) -> str:
 
 def _build_deadline_list_text(rows: list[dict]) -> str:
     if not rows:
-        return "Không tìm thấy deadline chưa hoàn thành sắp tới."
+        return "Đã hoàn thành tất cả hạng mục công việc, ngài đã làm tốt lắm ạ."
     lines = [f"Có {len(rows)} deadline sắp tới:"]
     from course_aliases import shorten_course_name
 
@@ -446,7 +446,7 @@ def _build_deadline_list_text(rows: list[dict]) -> str:
 
 def _build_deadline_detail_text(row: dict | None) -> str:
     if not row:
-        return "Không tìm thấy deadline cho môn này."
+        return "Không tìm thấy deadline cho môn này thưa Master."
     from course_aliases import shorten_course_name
 
     course_name, activity = _deadline_title_parts(row)
@@ -509,8 +509,8 @@ def _format_calendar_event_time(value: object) -> str:
 
 def _build_exam_list_text(rows: list[dict]) -> str:
     if not rows:
-        return "Không tìm thấy lịch thi trong 90 ngày tới."
-    lines = [f"Có {len(rows)} lịch thi trong 90 ngày tới:"]
+        return "Không tìm thấy lịch thi trong 90 ngày tới thưa Master."
+    lines = [f"Có {len(rows)} lịch thi trong 90 ngày tới ạ:"]
     for row in rows:
         title = str(row.get("title") or "Lịch thi").removeprefix("[EXAM] ")
         line = f"- {_format_calendar_event_time(row.get('start'))}: {title}"
@@ -625,7 +625,7 @@ def _advance_add_form_state(state: dict[str, object], user_text: str) -> str:
         return _build_add_form_prompt(state)
     if step == "job":
         if not value:
-            raise ValueError("Mục 'Làm gì' không được để trống.")
+            raise ValueError("Mục 'Làm gì' không được để trống đâu Master ạ.")
         state["job"] = value
         state["step"] = "where"
         return _build_add_form_prompt(state)
@@ -633,12 +633,12 @@ def _advance_add_form_state(state: dict[str, object], user_text: str) -> str:
         state["where"] = value or None
         state["step"] = "confirm"
         return _build_add_form_review_text(state)
-    raise ValueError("Form thêm lịch đang ở trạng thái không hợp lệ.")
+    raise ValueError("Form thêm lịch đang ở trạng thái không hợp lệ ạ.")
 
 
 def _skip_add_form_optional_step(state: dict[str, object]) -> str:
     if str(state.get("step") or "") != "where":
-        raise ValueError("Không thể bỏ qua ở bước hiện tại.")
+        raise ValueError("Không thể bỏ qua ở bước hiện tại, Master ạ.")
     state["where"] = None
     state["step"] = "confirm"
     return _build_add_form_review_text(state)
@@ -660,7 +660,7 @@ def _build_add_appointment_from_form(state: dict[str, object]) -> tuple[str, dt.
     start_time = _parse_clock_field(state.get("time") or "")
     title = str(state.get("job") or "").strip()
     if not title:
-        raise ValueError("Mục 'Làm gì' không được để trống.")
+        raise ValueError("Mục 'Làm gì' không được để trống ạ.")
     location = _normalize_optional_text(state.get("where"))
     return title, appointment_date, start_time, location
 
@@ -694,9 +694,9 @@ def _build_appointment_confirmation(title: str, appt_date: dt.date, start_time: 
 
 def _build_today_appointments_text(rows: list[dict]) -> str:
     today = local_today().strftime("%d/%m/%Y")
-    lines = [f"Lich hen hom nay ({today}):"]
+    lines = [f"Thưa Master, lịch hẹn ngày hôm nay ({today}):"]
     if not rows:
-        lines.append("- Khong co lich hen.")
+        lines.append("- Không có lịch hẹn ạ.")
         return "\n".join(lines)
 
     for idx, row in enumerate(rows, start=1):
@@ -718,10 +718,10 @@ def _fallback_conversational_reply(user_text: str) -> str:
     if "cảm ơn" in lower:
         return "Không có gì đâu, Tôi luôn sẵn sàng hỗ trợ Master ạ."
     if "buồn" in lower or "mệt" in lower:
-        return "Ôm tinh thần Master một cái nhẹ nha, nghỉ một chút rồi Tôi cùng sắp xếp lại lịch cho dễ thở hơn."
+        return "Ôi Master tội nghiệp của tôi ơi, nghỉ một chút rồi chúng ta cùng sắp xếp lại lịch cho dễ thở hơn nhé thưa \"My Lady\"."
     return (
         "Tôi vẫn ở đây để nghe Master ạ. "
-        "Nếu cần tạo lịch hẹn, Master cứ nhắn kiểu: họp nhóm-15/04 14h00-B402."
+        "Nếu cần tạo lịch hẹn, Master ra lệnh: họp nhóm-15/04 14h00-B402."
     )
 
 
