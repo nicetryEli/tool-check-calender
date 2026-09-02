@@ -82,13 +82,13 @@ def _telegram_api(token: str, method: str) -> str:
 
 
 def _load_env() -> tuple[str, str, str, str | None]:
-    token = os.environ.get("TELEGRAM_bot_TOKEN", "").strip()
+    token = os.environ.get("TELEGRAM_BOT_TOKEN", "").strip()
     allowed_chat_id = os.environ.get("TELEGRAM_CHAT_ID", "").strip()
     webhook_url = os.environ.get("TELEGRAM_WEBHOOK_URL", "").strip()
     webhook_secret = os.environ.get("TELEGRAM_WEBHOOK_SECRET", "").strip() or None
 
     if not token:
-        raise RuntimeError("Missing TELEGRAM_bot_TOKEN.")
+        raise RuntimeError("Missing TELEGRAM_BOT_TOKEN.")
 
     return token, allowed_chat_id, webhook_url, webhook_secret
 
