@@ -578,7 +578,7 @@ def _format_add_form_value(value: object) -> str:
 
 def _build_add_form_review_text(state: dict[str, object]) -> str:
     return (
-        "Mình đã nhận form:\n"
+        "Tôi đã nhận form:\n"
         f"- Ngày: {_format_add_form_value(state.get('date'))}\n"
         f"- Giờ: {_format_add_form_value(state.get('time'))}\n"
         f"- Làm gì: {_format_add_form_value(state.get('job'))}\n"
@@ -689,7 +689,7 @@ def _build_appointment_confirmation(title: str, appt_date: dt.date, start_time: 
         conf += f" {display_time}"
     if location:
         conf += f" - {location}"
-    return conf + "\nMình đã lưu giúp bạn rồi nè."
+    return conf + "\nTôi đã lưu giúp Master rồi ạ."
 
 
 def _build_today_appointments_text(rows: list[dict]) -> str:
@@ -714,14 +714,14 @@ def _build_today_appointments_text(rows: list[dict]) -> str:
 def _fallback_conversational_reply(user_text: str) -> str:
     lower = user_text.lower()
     if any(word in lower for word in ("chào", "hello", "hi")):
-        return "Chào bạn, mình đây nè. Bạn muốn mình nhắc lịch hay trò chuyện một chút?"
+        return "Chào Master, Tôi đây ạ. Master muốn Tôi nhắc lịch hay trò chuyện một chút?"
     if "cảm ơn" in lower:
-        return "Không có gì đâu, mình luôn sẵn sàng hỗ trợ bạn nè."
+        return "Không có gì đâu, Tôi luôn sẵn sàng hỗ trợ Master ạ."
     if "buồn" in lower or "mệt" in lower:
-        return "Ôm tinh thần bạn một cái nhẹ nha, nghỉ một chút rồi mình cùng sắp xếp lại lịch cho dễ thở hơn."
+        return "Ôm tinh thần Master một cái nhẹ nha, nghỉ một chút rồi Tôi cùng sắp xếp lại lịch cho dễ thở hơn."
     return (
-        "Mình vẫn ở đây để nghe bạn nè. "
-        "Nếu cần tạo lịch hẹn, bạn cứ nhắn kiểu: họp nhóm-15/04 14h00-B402."
+        "Tôi vẫn ở đây để nghe Master ạ. "
+        "Nếu cần tạo lịch hẹn, Master cứ nhắn kiểu: họp nhóm-15/04 14h00-B402."
     )
 
 
@@ -796,7 +796,7 @@ def run() -> None:
                         continue
                     if data_value == ADD_FORM_SKIP_WHERE_CALLBACK:
                         if not form_state:
-                            _send_text(token, chat_id, "Form đã hết hạn. Bạn dùng /add để tạo lại nhé.")
+                            _send_text(token, chat_id, "Form đã hết hạn. Master dùng /add để tạo lại nhé.")
                             continue
                         try:
                             reply = _skip_add_form_optional_step(form_state)
@@ -807,10 +807,10 @@ def run() -> None:
                         continue
                     if data_value == ADD_FORM_DONE_CALLBACK:
                         if not form_state:
-                            _send_text(token, chat_id, "Form đã hết hạn. Bạn dùng /add để tạo lại nhé.")
+                            _send_text(token, chat_id, "Form đã hết hạn. Master dùng /add để tạo lại nhé.")
                             continue
                         if not _is_add_form_complete(form_state):
-                            _send_add_form_step(token, chat_id, form_state, prefix="Bạn chưa điền xong form.")
+                            _send_add_form_step(token, chat_id, form_state, prefix="Master chưa điền xong form.")
                             continue
                         title, appt_date, start_time, location = _build_add_appointment_from_form(form_state)
                         insert_calendar_event(
@@ -846,7 +846,7 @@ def run() -> None:
 
                 if lowered == "/done" and form_state:
                     if not _is_add_form_complete(form_state):
-                        _send_add_form_step(token, chat_id, form_state, prefix="Bạn chưa điền xong form.")
+                        _send_add_form_step(token, chat_id, form_state, prefix="Master chưa điền xong form.")
                         continue
                     title, appt_date, start_time, location = _build_add_appointment_from_form(form_state)
                     insert_calendar_event(

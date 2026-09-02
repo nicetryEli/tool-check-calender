@@ -10,20 +10,20 @@ services:
       - key: PORT
         value: 8000
       - key: STUDENT_ID
-        sync: false
+        sync: true
       - key: PASSWORD
-        sync: false
+        sync: true
       - key: TELEGRAM_BOT_TOKEN
-        sync: false
+        sync: true
       - key: TELEGRAM_CHAT_ID
-        sync: false
+        sync: true
       - key: TELEGRAM_WEBHOOK_URL
-        sync: false
+        sync: true
       - key: TELEGRAM_WEBHOOK_SECRET
         generateValue: true
       - key: GEMINI_API_KEY
-        sync: false
+        sync: true
       - key: GOOGLE_CALENDAR_ID
-        sync: false
+        sync: true
       - key: GOOGLE_SERVICE_ACCOUNT_JSON
-        sync: false
+        sync: true

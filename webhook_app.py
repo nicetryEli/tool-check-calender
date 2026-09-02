@@ -65,15 +65,15 @@ HEALTH_PATH = "/health"
 WEBHOOK_INFO_PATH = "/telegram/webhook/info"
 GEMINI_HEALTH_PATH = "/gemini/health"
 _ADD_FORM_STATES: dict[str, dict[str, object]] = {}
-ADD_ONLY_GUIDANCE_TEXT = "Để thêm lịch, bạn dùng /add. Bot sẽ hỏi lần lượt từng mục để bạn nhập nhanh hơn nhé."
+ADD_ONLY_GUIDANCE_TEXT = "Để thêm lịch, Master dùng /add. Tôi sẽ hỏi lần lượt từng mục để Master nhập nhanh hơn nhé."
 START_HELP_TEXT = (
-    "Bot hiện hỗ trợ các lệnh sau:\n"
+    "Tôi hiện hỗ trợ các lệnh sau:\n"
     "/today - Xem lịch hẹn hôm nay\n"
     "/schedule - Xem lịch học\n"
     "/deadline - Xem deadline eLearning\n"
     "/exam - Xem lịch thi 90 ngày tới\n"
     "/add - Mở form thêm lịch\n\n"
-    "Muốn tạo lịch mới thì dùng /add, bot sẽ hỏi lần lượt Ngày, Giờ, Làm gì, Ở đâu."
+    "Muốn tạo lịch mới thì dùng /add, Tôi sẽ hỏi lần lượt Ngày, Giờ, Làm gì, Ở đâu."
 )
 
 
@@ -82,13 +82,13 @@ def _telegram_api(token: str, method: str) -> str:
 
 
 def _load_env() -> tuple[str, str, str, str | None]:
-    token = os.environ.get("TELEGRAM_BOT_TOKEN", "").strip()
+    token = os.environ.get("TELEGRAM_bot_TOKEN", "").strip()
     allowed_chat_id = os.environ.get("TELEGRAM_CHAT_ID", "").strip()
     webhook_url = os.environ.get("TELEGRAM_WEBHOOK_URL", "").strip()
     webhook_secret = os.environ.get("TELEGRAM_WEBHOOK_SECRET", "").strip() or None
 
     if not token:
-        raise RuntimeError("Missing TELEGRAM_BOT_TOKEN.")
+        raise RuntimeError("Missing TELEGRAM_bot_TOKEN.")
 
     return token, allowed_chat_id, webhook_url, webhook_secret
 
@@ -161,7 +161,7 @@ def _register_webhook(token: str, webhook_url: str, webhook_secret: str | None) 
 
 def _register_command_menu(token: str) -> None:
     commands = [
-        {"command": "start", "description": "Hướng dẫn sử dụng bot"},
+        {"command": "start", "description": "Hướng dẫn sử dụng tôi"},
         {"command": "today", "description": "Xem lịch hẹn hôm nay"},
         {"command": "schedule", "description": "Xem lịch học"},
         {"command": "deadline", "description": "Xem deadline eLearning"},
@@ -283,10 +283,10 @@ async def telegram_webhook(
                 timeout=10,
             )
             if not state:
-                _send_text(token, chat_id, "Form đã hết hạn. Bạn dùng /add để tạo lại nhé.")
+                _send_text(token, chat_id, "Form đã hết hạn. Master dùng /add để tạo lại nhé.")
                 return {"ok": True}
             if not _is_add_form_complete(state):
-                _send_add_form_step(token, chat_id, state, prefix="Bạn chưa điền xong form.")
+                _send_add_form_step(token, chat_id, state, prefix="Master chưa điền xong form.")
                 return {"ok": True}
             title, appt_date, start_time, location = _build_add_appointment_from_form(state)
             insert_calendar_event(
@@ -307,7 +307,7 @@ async def telegram_webhook(
                 timeout=10,
             )
             if not state:
-                _send_text(token, chat_id, "Form đã hết hạn. Bạn dùng /add để tạo lại nhé.")
+                _send_text(token, chat_id, "Form đã hết hạn. Master dùng /add để tạo lại nhé.")
                 return {"ok": True}
             try:
                 reply = _skip_add_form_optional_step(state)
@@ -339,7 +339,7 @@ async def telegram_webhook(
 
         if lowered == "/done" and form_state:
             if not _is_add_form_complete(form_state):
-                _send_add_form_step(token, chat_id, form_state, prefix="Bạn chưa điền xong form.")
+                _send_add_form_step(token, chat_id, form_state, prefix="Master chưa điền xong form.")
                 return {"ok": True}
             title, appt_date, start_time, location = _build_add_appointment_from_form(form_state)
             insert_calendar_event(
