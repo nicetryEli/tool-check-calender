@@ -32,8 +32,7 @@ def _managed_source_types_for_crawler_sync() -> frozenset[str]:
     """Source types owned by ``sync_crawled_data_to_google_calendar``.
 
     Crawler sync only manages ``class_sessions``, ``exams``, and ``deadlines``. It must never
-    delete events created by Telegram ``/add`` (``source_type=appointment``) or
-    by Telegram ``/add`` (``source_type=appointment``).
+    delete manually created events (``source_type=appointment``).
     """
     return frozenset({SYNC_SOURCE_CLASS_SESSION, SYNC_SOURCE_EXAM, SYNC_SOURCE_DEADLINE})
 CALENDAR_API_MAX_ATTEMPTS = 4
@@ -203,7 +202,7 @@ def sync_crawled_data_to_google_calendar(
 
 
 def insert_calendar_event(title: str, appointment_date: dt.date, start_time: str | None, end_time: str | None, location: str | None, note: str | None) -> str:
-    """Insert a single event directly into Google Calendar (used by Telegram /add)."""
+    """Insert a single manually created event directly into Google Calendar."""
     calendar_id = os.environ.get("GOOGLE_CALENDAR_ID", "").strip()
     service_account_json = os.environ.get("GOOGLE_SERVICE_ACCOUNT_JSON", "").strip()
     service_account_file = os.environ.get("GOOGLE_SERVICE_ACCOUNT_FILE", "").strip()
@@ -390,7 +389,7 @@ def fetch_tagged_calendar_events(
 
 
 def find_tagged_calendar_event(source_type: str, source_key: str) -> dict | None:
-    """Find a future tagged event selected through a Telegram callback."""
+    """Find a future tagged event by source type and key."""
     return next(
         (
             event
@@ -672,7 +671,7 @@ def _build_sync_items_from_sessions(
 ) -> list[dict]:
     timezone = os.environ.get("APP_TIMEZONE", "Asia/Ho_Chi_Minh")
     items: list[dict] = []
-    appointments: list[dict] = []  # Appointments are inserted directly by Telegram /add.
+    appointments: list[dict] = []  # Appointments are inserted manually, not crawled.
 
     # Load contacts for attendee auto-add on class session events.
     all_contacts = _load_contacts()
@@ -961,7 +960,7 @@ def _replace_bot_events_for_range(
     Only events whose ``extendedProperties.private.source_type`` is in
     ``managed_source_types`` are eligible for deletion. This guarantees that
     one sync entry (e.g. the crawler sync) never purges events owned by
-    another entry (e.g. appointments created by Telegram ``/add``).
+    another entry (e.g. manually created appointments).
     """
     existing_by_key, legacy_events = _list_bot_events(service, calendar_id)
     current_keys = {item["source_key"] for item in sync_items}

@@ -6,8 +6,7 @@ This script runs the data-collection pipeline:
     2. Push raw crawler results directly to Google Calendar.
     3. Finish after Calendar reconciliation.
 
-Can be scheduled to run hourly via cron, Railway Scheduled Jobs, or similar.
-This does NOT send Telegram notifications; that's handled separately by main.py.
+Can be scheduled to run hourly via cron, GitHub Actions, or similar.
 """
 
 import logging
@@ -52,16 +51,8 @@ def _resolve_crawler_weeks_ahead() -> int:
 
 
 def _handle_error(context: str, exc: Exception) -> None:
-    """Log error and send alert if possible."""
-    error_msg = f"{context}: {exc}"
-    logger.exception(error_msg)
-
-    try:
-        from notifier import send_error_alert
-        send_error_alert(error_msg)
-    except Exception as alert_exc:
-        logger.error("Could not send error alert: %s", alert_exc)
-
+    """Log the error and exit non-zero so the scheduler marks the run failed."""
+    logger.exception("%s: %s", context, exc)
     sys.exit(1)
 
 

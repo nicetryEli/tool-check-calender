@@ -33,8 +33,6 @@ jobs:
     env:
       STUDENT_ID: ${{ secrets.STUDENT_ID }}
       PASSWORD: ${{ secrets.PASSWORD }}
-      TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
-      TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
       CRAWLER_WEEKS_AHEAD: ${{ secrets.CRAWLER_WEEKS_AHEAD }}
       GOOGLE_CALENDAR_ID: ${{ secrets.GOOGLE_CALENDAR_ID }}
       GOOGLE_SERVICE_ACCOUNT_JSON: ${{ secrets.GOOGLE_SERVICE_ACCOUNT_JSON }}
