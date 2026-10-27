@@ -1,0 +1,73 @@
+# .github/workflows/daily_notify.yml
+#
+# GitHub Actions workflow – daily schedule notification via ntfy
+#
+# Schedule: runs every day at 22:00 UTC = 05:00 Vietnam time (UTC+7).
+# This reads today's and tomorrow's schedule from Google Calendar and pushes
+# one notification to your phone.
+#
+# Note: Data collection (crawl, sync, calendar) is handled by hourly_sync.yml.
+# This job only reads Google Calendar, so it takes a few seconds.
+
+name: Daily Schedule Notification
+
+on:
+  schedule:
+    # Cron syntax: minute hour day-of-month month day-of-week
+    # 22:00 UTC = 05:00 ICT (UTC+7)
+    - cron: "0 22 * * *"
+
+  # Allow manual triggers from the GitHub Actions UI
+  workflow_dispatch:
+
+jobs:
+  notify:
+    name: Send Daily Schedule
+    runs-on: ubuntu-latest
+
+    # Restrict GITHUB_TOKEN to the minimum required permissions.
+    # This workflow only reads repository contents (checkout) and does not
+    # write back to the repository.
+    permissions:
+      contents: read
+
+    # All secrets are injected as environment variables so the Python code
+    # can read them with os.environ.
+    env:
+      GOOGLE_CALENDAR_ID: ${{ secrets.GOOGLE_CALENDAR_ID }}
+      GOOGLE_SERVICE_ACCOUNT_JSON: ${{ secrets.GOOGLE_SERVICE_ACCOUNT_JSON }}
+      GOOGLE_CALENDAR_REQUIRED: ${{ secrets.GOOGLE_CALENDAR_REQUIRED }}
+      GOOGLE_TASKS_CLIENT_ID: ${{ secrets.GOOGLE_TASKS_CLIENT_ID }}
+      GOOGLE_TASKS_CLIENT_SECRET: ${{ secrets.GOOGLE_TASKS_CLIENT_SECRET }}
+      GOOGLE_TASKS_REFRESH_TOKEN: ${{ secrets.GOOGLE_TASKS_REFRESH_TOKEN }}
+      NTFY_TOPIC: ${{ secrets.NTFY_TOPIC }}
+      NTFY_TOKEN: ${{ secrets.NTFY_TOKEN }}
+      APP_TIMEZONE: Asia/Ho_Chi_Minh
+
+    steps:
+      # -----------------------------------------------------------------------
+      # 1. Check out the repository
+      # -----------------------------------------------------------------------
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # -----------------------------------------------------------------------
+      # 2. Set up Python 3.11
+      # -----------------------------------------------------------------------
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: "pip"           # Cache pip downloads between runs
+
+      # -----------------------------------------------------------------------
+      # 3. Install Python dependencies
+      # -----------------------------------------------------------------------
+      - name: Install Python dependencies
+        run: pip install -r requirements.txt
+
+      # -----------------------------------------------------------------------
+      # 4. Send the daily notification
+      # -----------------------------------------------------------------------
+      - name: Send daily ntfy notification
+        run: python daily_notify.py
