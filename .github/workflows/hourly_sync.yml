@@ -64,13 +64,16 @@ jobs:
       # -----------------------------------------------------------------------
       # 4. Install Playwright browsers (Chromium only)
       # -----------------------------------------------------------------------
+      # Note: playwright install --with-deps chromium fails on ubuntu26.04-x64.
+      # Using playwright install chromium (without --with-deps) downloads the
+      # fallback ubuntu24.04-x64 build which works around this issue.
       - name: Install Playwright browsers
-        run: playwright install --with-deps chromium
+        run: playwright install chromium
 
       - name: Upgrade Playwright
         run: pip install --upgrade "playwright>=1.61"
       - name: Install Chromium
-        run: python -m playwright install --with-deps chromium
+        run: python -m playwright install chromium
       # -----------------------------------------------------------------------
       # 5. Create Google service account file (if needed)
       # -----------------------------------------------------------------------
